@@ -235,8 +235,12 @@
 
             <div class="sensitivity-control">
                 <label for="sensitivity">Herkkyys:</label>
-                <input type="range" id="sensitivity" min="0.1" max="0.9" value="0.3" step="0.05">
-                <div>Nykyinen: <span id="sensitivityValue">0.30</span></div>
+                <input type="range" id="sensitivity" min="0.05" max="0.5" value="0.15" step="0.01">
+                <div>Nykyinen: <span id="sensitivityValue">0.15</span></div>
+                <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;">
+                    Matala = vain voimakkaat lyönnit<br>
+                    Korkea = myös hiljaiset lyönnit
+                </div>
             </div>
         </div>
 
@@ -280,9 +284,11 @@
                 this.selectedTime = 60;
                 this.startTime = null;
                 this.endTime = null;
-                this.sensitivity = 0.3;
+                this.sensitivity = 0.15;
                 this.lastBeatTime = 0;
-                this.minBeatInterval = 50; // Minimiväli lyöntien välillä (ms)
+                this.minBeatInterval = 0; // Ei minimiväliä
+                this.volumeHistory = [];
+                this.peakThreshold = 2.0; // Kuinka paljon korkeampi kuin keskiarvo
                 this.timer = null;
                 
                 this.initializeElements();
@@ -369,14 +375,28 @@
 
                     this.analyser.getByteFrequencyData(this.dataArray);
                     
-                    // Laske äänenvoimakkuus
-                    let sum = 0;
-                    for (let i = 0; i < this.dataArray.length; i++) {
-                        sum += this.dataArray[i];
+                    // Keskity mataliin taajuuksiin (rumpujen äänet)
+                    let bassSum = 0;
+                    let midSum = 0;
+                    const bassRange = Math.floor(this.dataArray.length * 0.1); // 0-10% taajuuksista
+                    const midRange = Math.floor(this.dataArray.length * 0.3);  // 10-30% taajuuksista
+                    
+                    // Laske matalien taajuuksien voimakkuus (rummut)
+                    for (let i = 0; i < bassRange; i++) {
+                        bassSum += this.dataArray[i];
                     }
-                    const average = sum / this.dataArray.length;
-                    const volume = average / 255;
-
+                    
+                    // Laske keskitaajuuksien voimakkuus (hälyäänet)
+                    for (let i = bassRange; i < midRange; i++) {
+                        midSum += this.dataArray[i];
+                    }
+                    
+                    const bassAvg = bassSum / bassRange;
+                    const midAvg = midSum / (midRange - bassRange);
+                    
+                    // Käytä bassoja pääasiallisena signaalina
+                    const volume = (bassAvg * 0.8 + midAvg * 0.2) / 255;
+                    
                     // Päivitä äänenvoimakkuusmittari
                     this.elements.audioBar.style.width = (volume * 100) + '%';
 
