@@ -404,8 +404,26 @@
                     return false;
                 }
 
-                // Tarkista ylittääkö äänenvoimakkuus kynnyksen
-                if (volume > this.sensitivity) {
+                // Lisää volyymihistoria
+                this.volumeHistory = this.volumeHistory || [];
+                this.volumeHistory.push(volume);
+                
+                // Pidä vain viimeiset 10 mittausta
+                if (this.volumeHistory.length > 10) {
+                    this.volumeHistory.shift();
+                }
+                
+                // Laske keskiarvo viimeisistä mittauksista
+                const avgVolume = this.volumeHistory.reduce((a, b) => a + b, 0) / this.volumeHistory.length;
+                
+                // Lyönti tunnistetaan jos:
+                // 1. Nykyinen volyymi ylittää kynnyksen
+                // 2. Se on merkittävästi korkeampi kuin keskiarvo (äkillinen piikki)
+                // 3. Riittävästi aikaa viimeisestä lyönnistä
+                const threshold = Math.max(this.sensitivity, avgVolume * 2);
+                const isSpike = volume > avgVolume * 1.5 && volume > 0.1;
+                
+                if (volume > threshold && isSpike) {
                     this.lastBeatTime = now;
                     return true;
                 }
