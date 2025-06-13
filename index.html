@@ -235,11 +235,11 @@
 
             <div class="sensitivity-control">
                 <label for="sensitivity">Herkkyys:</label>
-                <input type="range" id="sensitivity" min="0.05" max="0.5" value="0.15" step="0.01">
-                <div>Nykyinen: <span id="sensitivityValue">0.15</span></div>
+                <input type="range" id="sensitivity" min="0.03" max="0.3" value="0.08" step="0.01">
+                <div>Nykyinen: <span id="sensitivityValue">0.08</span></div>
                 <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;">
-                    Matala = vain voimakkaat lyönnit<br>
-                    Korkea = myös hiljaiset lyönnit
+                    Hyvin matala = vain erittäin voimakkaat piikit<br>
+                    Matala = selkeät lyönnit tunnistetaan
                 </div>
             </div>
         </div>
@@ -284,9 +284,9 @@
                 this.selectedTime = 60;
                 this.startTime = null;
                 this.endTime = null;
-                this.sensitivity = 0.15;
+                this.sensitivity = 0.08;
                 this.lastBeatTime = 0;
-                this.minBeatInterval = 0; // Ei minimiväliä
+                this.minBeatInterval = 20; // Hyvin lyhyt 20ms väliaika
                 this.volumeHistory = [];
                 this.peakThreshold = 2.0; // Kuinka paljon korkeampi kuin keskiarvo
                 this.timer = null;
@@ -375,27 +375,34 @@
 
                     this.analyser.getByteFrequencyData(this.dataArray);
                     
-                    // Keskity mataliin taajuuksiin (rumpujen äänet)
+                    // Keskity keskitaajuuksiin (rummuista tuleva naksahdus/paukahdus)
                     let bassSum = 0;
                     let midSum = 0;
-                    const bassRange = Math.floor(this.dataArray.length * 0.1); // 0-10% taajuuksista
-                    const midRange = Math.floor(this.dataArray.length * 0.3);  // 10-30% taajuuksista
+                    let highSum = 0;
                     
-                    // Laske matalien taajuuksien voimakkuus (rummut)
+                    const bassRange = Math.floor(this.dataArray.length * 0.15); // 0-15% taajuuksista (matala)
+                    const midRange = Math.floor(this.dataArray.length * 0.6);   // 15-60% taajuuksista (keski)
+                    const highRange = this.dataArray.length;                    // 60-100% taajuuksista (korkea)
+                    
+                    // Laske eri taajuusalueiden voimakkuudet
                     for (let i = 0; i < bassRange; i++) {
                         bassSum += this.dataArray[i];
                     }
                     
-                    // Laske keskitaajuuksien voimakkuus (hälyäänet)
                     for (let i = bassRange; i < midRange; i++) {
                         midSum += this.dataArray[i];
                     }
                     
+                    for (let i = midRange; i < highRange; i++) {
+                        highSum += this.dataArray[i];
+                    }
+                    
                     const bassAvg = bassSum / bassRange;
                     const midAvg = midSum / (midRange - bassRange);
+                    const highAvg = highSum / (highRange - midRange);
                     
-                    // Käytä bassoja pääasiallisena signaalina
-                    const volume = (bassAvg * 0.8 + midAvg * 0.2) / 255;
+                    // Painotus: keskiäänet pääosassa, vähän bassoa, ei korkeita
+                    const volume = (bassAvg * 0.2 + midAvg * 0.8) / 255;
                     
                     // Päivitä äänenvoimakkuusmittari
                     this.elements.audioBar.style.width = (volume * 100) + '%';
@@ -419,31 +426,30 @@
             detectBeat(volume) {
                 const now = Date.now();
                 
-                // Tarkista onko riittävästi aikaa viimeisestä lyönnistä
-                if (now - this.lastBeatTime < this.minBeatInterval) {
-                    return false;
-                }
-
+                // Ei minimiväliä - voi tunnistaa nopeitakin lyöntejä
+                
                 // Lisää volyymihistoria
                 this.volumeHistory = this.volumeHistory || [];
                 this.volumeHistory.push(volume);
                 
-                // Pidä vain viimeiset 10 mittausta
-                if (this.volumeHistory.length > 10) {
+                // Pidä vain viimeiset 20 mittausta (pidempi historia)
+                if (this.volumeHistory.length > 20) {
                     this.volumeHistory.shift();
                 }
                 
-                // Laske keskiarvo viimeisistä mittauksista
+                // Laske keskiarvo ja maksimi viimeisistä mittauksista
                 const avgVolume = this.volumeHistory.reduce((a, b) => a + b, 0) / this.volumeHistory.length;
+                const maxVolume = Math.max(...this.volumeHistory);
                 
-                // Lyönti tunnistetaan jos:
-                // 1. Nykyinen volyymi ylittää kynnyksen
-                // 2. Se on merkittävästi korkeampi kuin keskiarvo (äkillinen piikki)
-                // 3. Riittävästi aikaa viimeisestä lyönnistä
-                const threshold = Math.max(this.sensitivity, avgVolume * 2);
-                const isSpike = volume > avgVolume * 1.5 && volume > 0.1;
+                // Hyvin tiukka piikin tunnistus:
+                // 1. Nykyinen volyymi on MERKITTÄVÄSTI korkeampi kuin keskiarvo
+                // 2. Ylittää peruskynnyksen
+                // 3. On lähellä historian maksimia (todellinen piikki)
+                const threshold = Math.max(this.sensitivity, avgVolume * 3.0); // 3x korkeampi kuin keskiarvo
+                const isSharpSpike = volume > avgVolume * 2.5 && volume > 0.08; // Voimakas piikki
+                const isNearMax = volume > maxVolume * 0.8; // Lähellä historiallista maksimia
                 
-                if (volume > threshold && isSpike) {
+                if (volume > threshold && isSharpSpike && isNearMax) {
                     this.lastBeatTime = now;
                     return true;
                 }
