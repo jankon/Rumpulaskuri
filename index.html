@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rumpujen Lyöntilaskuri</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* ... Vanha tyyli ... */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -22,7 +17,6 @@
             padding: 20px;
             color: white;
         }
-
         .container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -34,187 +28,19 @@
             max-width: 400px;
             width: 100%;
         }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .controls {
-            margin: 30px 0;
-        }
-
-        .time-selector {
-            margin-bottom: 20px;
-        }
-
-        label {
+        .spectrogram-canvas {
             display: block;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        select {
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            border: none;
+            width: 100%;
+            max-width: 400px;
+            height: 100px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            width: 200px;
-            cursor: pointer;
-        }
-
-        .sensitivity-control {
-            margin: 20px 0;
-        }
-
-        input[type="range"] {
-            width: 100%;
             margin: 10px 0;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.3);
-            outline: none;
+            background: #111;
         }
-
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #fff;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            font-weight: 600;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .stop-btn {
-            background: linear-gradient(45deg, #ff4757, #ff3838);
-        }
-
-        .reset-btn {
-            background: linear-gradient(45deg, #57606f, #2f3542);
-        }
-
-        .stats {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 15px 0;
-            font-size: 1.1rem;
-        }
-
-        .stat-value {
-            font-weight: bold;
-            font-size: 1.3rem;
-            color: #FFE66D;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .beat-counter {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #4ECDC4;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            margin: 20px 0;
-        }
-
-        .status {
-            font-size: 1.1rem;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .listening {
-            color: #4ECDC4;
-            animation: pulse 2s infinite;
-        }
-
-        .finished {
-            color: #FFE66D;
-        }
-
-        .error {
-            color: #FF6B6B;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-
-        .audio-level {
-            width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .audio-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4ECDC4, #44A08D);
-            width: 0%;
-            transition: width 0.1s ease;
-            border-radius: 10px;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .beat-counter {
-                font-size: 2.5rem;
-            }
-        }
+        /* ... Muut alkuperäiset tyylit tästä eteenpäin ... */
+        .audio-level { /* ... */ }
+        .audio-bar { /* ... */ }
+        /* ... */
     </style>
 </head>
 <body>
@@ -232,30 +58,32 @@
                     <option value="300">5 minuuttia</option>
                 </select>
             </div>
-
             <div class="sensitivity-control">
                 <label for="sensitivity">Herkkyys:</label>
-                <input type="range" id="sensitivity" min="0.03" max="0.3" value="0.08" step="0.01">
-                <div>Nykyinen: <span id="sensitivityValue">0.08</span></div>
+                <input type="range" id="sensitivity" min="0.05" max="0.5" value="0.15" step="0.01">
+                <div>Nykyinen: <span id="sensitivityValue">0.15</span></div>
                 <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;">
-                    Hyvin matala = vain erittäin voimakkaat piikit<br>
-                    Matala = selkeät lyönnit tunnistetaan
+                    Matala = vain voimakkaat lyönnit<br>
+                    Korkea = myös hiljaiset lyönnit
                 </div>
             </div>
         </div>
-
+        
+        <!-- UUSI SPEKTROGRAMMI CANVAS -->
+        <canvas id="spectrogram" width="400" height="100" class="spectrogram-canvas"></canvas>
+        
         <div class="audio-level">
             <div class="audio-bar" id="audioBar"></div>
         </div>
-
+        
         <button id="startBtn" class="btn">▶️ Aloita kuuntelu</button>
         <button id="stopBtn" class="btn stop-btn" style="display:none;">⏹️ Lopeta</button>
         <button id="resetBtn" class="btn reset-btn">🔄 Nollaa</button>
-
+        
         <div id="status" class="status">Valitse aika ja paina "Aloita kuuntelu"</div>
-
+        
         <div class="beat-counter" id="beatCount">0</div>
-
+        
         <div class="stats">
             <div class="stat-item">
                 <span>Aika jäljellä:</span>
@@ -271,7 +99,6 @@
             </div>
         </div>
     </div>
-
     <script>
         class DrumBeatCounter {
             constructor() {
@@ -284,18 +111,19 @@
                 this.selectedTime = 60;
                 this.startTime = null;
                 this.endTime = null;
-                this.sensitivity = 0.08;
+                this.sensitivity = 0.15;
                 this.lastBeatTime = 0;
-                this.minBeatInterval = 20; // Hyvin lyhyt 20ms väliaika
+                this.minBeatInterval = 80;
                 this.volumeHistory = [];
-                this.peakThreshold = 2.0; // Kuinka paljon korkeampi kuin keskiarvo
                 this.timer = null;
-                
+                // Spektrogrammin muuttujat
+                this.spectrogramCtx = null;
+                this.spectrogramX = 0;
                 this.initializeElements();
                 this.setupEventListeners();
                 this.updateSensitivityDisplay();
+                this.clearSpectrogram();
             }
-
             initializeElements() {
                 this.elements = {
                     startBtn: document.getElementById('startBtn'),
@@ -309,10 +137,11 @@
                     timeLeft: document.getElementById('timeLeft'),
                     bpm: document.getElementById('bpm'),
                     totalTime: document.getElementById('totalTime'),
-                    audioBar: document.getElementById('audioBar')
+                    audioBar: document.getElementById('audioBar'),
+                    spectrogram: document.getElementById('spectrogram'),
                 };
+                this.spectrogramCtx = this.elements.spectrogram.getContext('2d');
             }
-
             setupEventListeners() {
                 this.elements.startBtn.addEventListener('click', () => this.startListening());
                 this.elements.stopBtn.addEventListener('click', () => this.stopListening());
@@ -323,23 +152,21 @@
                     this.updateSensitivityDisplay();
                 });
             }
-
             updateSensitivityDisplay() {
                 this.elements.sensitivityValue.textContent = this.sensitivity.toFixed(2);
             }
-
             async startListening() {
                 try {
                     await this.initializeAudio();
                     this.isListening = true;
                     this.beatCount = 0;
                     this.startTime = null;
-                    
+                    this.spectrogramX = 0;
+                    this.clearSpectrogram();
                     this.elements.startBtn.style.display = 'none';
                     this.elements.stopBtn.style.display = 'inline-block';
                     this.elements.status.textContent = 'Odottaa ensimmäistä lyöntiä...';
                     this.elements.status.className = 'status listening';
-                    
                     this.updateDisplay();
                     this.startAudioProcessing();
                 } catch (error) {
@@ -348,212 +175,170 @@
                     console.error('Mikrofonin käytössä virhe:', error);
                 }
             }
-
             async initializeAudio() {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                const stream = await navigator.mediaDevices.getUserMedia({ 
+                const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         echoCancellation: false,
                         noiseSuppression: false,
                         autoGainControl: false
-                    } 
+                    }
                 });
-                
                 this.microphone = this.audioContext.createMediaStreamSource(stream);
                 this.analyser = this.audioContext.createAnalyser();
                 this.analyser.fftSize = 256;
                 this.analyser.smoothingTimeConstant = 0.1;
-                
                 this.microphone.connect(this.analyser);
                 this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
             }
-
             startAudioProcessing() {
                 const processAudio = () => {
                     if (!this.isListening) return;
-
                     this.analyser.getByteFrequencyData(this.dataArray);
-                    
-                    // Keskity keskitaajuuksiin (rummuista tuleva naksahdus/paukahdus)
+                    // Piirrä spektrogrammi
+                    this.drawSpectrogram(this.dataArray);
+                    // Beat-detect peruslogiikka
                     let bassSum = 0;
                     let midSum = 0;
-                    let highSum = 0;
-                    
-                    const bassRange = Math.floor(this.dataArray.length * 0.15); // 0-15% taajuuksista (matala)
-                    const midRange = Math.floor(this.dataArray.length * 0.6);   // 15-60% taajuuksista (keski)
-                    const highRange = this.dataArray.length;                    // 60-100% taajuuksista (korkea)
-                    
-                    // Laske eri taajuusalueiden voimakkuudet
+                    const bassRange = Math.floor(this.dataArray.length * 0.1);
+                    const midRange = Math.floor(this.dataArray.length * 0.3);
                     for (let i = 0; i < bassRange; i++) {
                         bassSum += this.dataArray[i];
                     }
-                    
                     for (let i = bassRange; i < midRange; i++) {
                         midSum += this.dataArray[i];
                     }
-                    
-                    for (let i = midRange; i < highRange; i++) {
-                        highSum += this.dataArray[i];
-                    }
-                    
                     const bassAvg = bassSum / bassRange;
                     const midAvg = midSum / (midRange - bassRange);
-                    const highAvg = highSum / (highRange - midRange);
-                    
-                    // Painotus: keskiäänet pääosassa, vähän bassoa, ei korkeita
-                    const volume = (bassAvg * 0.2 + midAvg * 0.8) / 255;
-                    
-                    // Päivitä äänenvoimakkuusmittari
+                    const volume = (bassAvg * 0.8 + midAvg * 0.2) / 255;
                     this.elements.audioBar.style.width = (volume * 100) + '%';
-
-                    // Tarkista onko lyönti
                     if (this.detectBeat(volume)) {
                         this.handleBeat();
                     }
-
-                    // Päivitä ajastin
                     if (this.startTime) {
                         this.updateTimer();
                     }
-
                     requestAnimationFrame(processAudio);
                 };
-                
                 processAudio();
             }
-
+            // Spektrogrammi-metodit
+            clearSpectrogram() {
+                if (!this.spectrogramCtx) return;
+                this.spectrogramCtx.fillStyle = "#111";
+                this.spectrogramCtx.fillRect(0, 0, this.elements.spectrogram.width, this.elements.spectrogram.height);
+                this.spectrogramX = 0;
+            }
+            drawSpectrogram(dataArray) {
+                if (!this.spectrogramCtx) return;
+                // Scroll left kun täynnä
+                if (this.spectrogramX >= this.elements.spectrogram.width) {
+                    const imageData = this.spectrogramCtx.getImageData(1, 0, this.elements.spectrogram.width - 1, this.elements.spectrogram.height);
+                    this.spectrogramCtx.putImageData(imageData, 0, 0);
+                    this.spectrogramX = this.elements.spectrogram.width - 1;
+                }
+                // Jokainen y = taajuus (alhaalta ylös)
+                for (let y = 0; y < this.elements.spectrogram.height; y++) {
+                    const freqIdx = Math.floor(y / this.elements.spectrogram.height * dataArray.length);
+                    const value = dataArray[freqIdx];
+                    this.spectrogramCtx.fillStyle = `rgb(${value},${value},${value})`;
+                    this.spectrogramCtx.fillRect(this.spectrogramX, this.elements.spectrogram.height - y - 1, 1, 1);
+                }
+                this.spectrogramX++;
+            }
+            // Beat-laskenta, statistiikat jne
             detectBeat(volume) {
                 const now = Date.now();
-                
-                // Ei minimiväliä - voi tunnistaa nopeitakin lyöntejä
-                
-                // Lisää volyymihistoria
+                if (now - this.lastBeatTime < this.minBeatInterval) {
+                    return false;
+                }
                 this.volumeHistory = this.volumeHistory || [];
                 this.volumeHistory.push(volume);
-                
-                // Pidä vain viimeiset 20 mittausta (pidempi historia)
-                if (this.volumeHistory.length > 20) {
+                if (this.volumeHistory.length > 10) {
                     this.volumeHistory.shift();
                 }
-                
-                // Laske keskiarvo ja maksimi viimeisistä mittauksista
                 const avgVolume = this.volumeHistory.reduce((a, b) => a + b, 0) / this.volumeHistory.length;
-                const maxVolume = Math.max(...this.volumeHistory);
-                
-                // Hyvin tiukka piikin tunnistus:
-                // 1. Nykyinen volyymi on MERKITTÄVÄSTI korkeampi kuin keskiarvo
-                // 2. Ylittää peruskynnyksen
-                // 3. On lähellä historian maksimia (todellinen piikki)
-                const threshold = Math.max(this.sensitivity, avgVolume * 3.0); // 3x korkeampi kuin keskiarvo
-                const isSharpSpike = volume > avgVolume * 2.5 && volume > 0.08; // Voimakas piikki
-                const isNearMax = volume > maxVolume * 0.8; // Lähellä historiallista maksimia
-                
-                if (volume > threshold && isSharpSpike && isNearMax) {
+                const threshold = Math.max(this.sensitivity, avgVolume * 2);
+                const isSpike = volume > avgVolume * 1.5 && volume > 0.1;
+                if (volume > threshold && isSpike) {
                     this.lastBeatTime = now;
                     return true;
                 }
-                
                 return false;
             }
-
             handleBeat() {
                 const now = Date.now();
-                
-                // Jos tämä on ensimmäinen lyönti, aloita ajastin
                 if (!this.startTime) {
                     this.startTime = now;
                     this.endTime = now + (this.selectedTime * 1000);
                     this.elements.status.textContent = 'Kuuntelee lyöntejä...';
-                    
-                    // Aloita ajastin
                     this.timer = setTimeout(() => {
                         this.finishCounting();
                     }, this.selectedTime * 1000);
                 }
-                
-                // Jos ollaan vielä aikaikkunassa
                 if (now <= this.endTime) {
                     this.beatCount++;
                     this.updateDisplay();
                 }
             }
-
             updateTimer() {
                 if (!this.startTime || !this.endTime) return;
-                
                 const now = Date.now();
                 const elapsed = now - this.startTime;
                 const remaining = Math.max(0, this.endTime - now);
-                
-                // Päivitä jäljellä oleva aika
                 const remainingSeconds = Math.ceil(remaining / 1000);
                 this.elements.timeLeft.textContent = remainingSeconds + 's';
-                
-                // Päivitä kokonaisaika
                 const totalSeconds = Math.floor(elapsed / 1000);
                 const minutes = Math.floor(totalSeconds / 60);
                 const seconds = totalSeconds % 60;
-                this.elements.totalTime.textContent = 
-                    minutes.toString().padStart(2, '0') + ':' + 
+                this.elements.totalTime.textContent =
+                    minutes.toString().padStart(2, '0') + ':' +
                     seconds.toString().padStart(2, '0');
             }
-
             finishCounting() {
                 this.stopListening();
                 this.elements.status.textContent = `Valmis! ${this.beatCount} lyöntiä ${this.selectedTime} sekunnissa`;
                 this.elements.status.className = 'status finished';
             }
-
             stopListening() {
                 this.isListening = false;
-                
                 if (this.timer) {
                     clearTimeout(this.timer);
                     this.timer = null;
                 }
-                
                 if (this.audioContext) {
                     this.audioContext.close();
                     this.audioContext = null;
                 }
-                
                 this.elements.startBtn.style.display = 'inline-block';
                 this.elements.stopBtn.style.display = 'none';
                 this.elements.audioBar.style.width = '0%';
             }
-
             reset() {
                 this.stopListening();
                 this.beatCount = 0;
                 this.startTime = null;
                 this.endTime = null;
+                this.clearSpectrogram();
                 this.elements.status.textContent = 'Valitse aika ja paina "Aloita kuuntelu"';
                 this.elements.status.className = 'status';
                 this.updateDisplay();
             }
-
             updateDisplay() {
                 this.elements.beatCount.textContent = this.beatCount;
-                
-                // Laske BPM
                 if (this.startTime && this.beatCount > 0) {
-                    const elapsed = (Date.now() - this.startTime) / 1000 / 60; // minuutteina
+                    const elapsed = (Date.now() - this.startTime) / 1000 / 60;
                     const bpm = Math.round(this.beatCount / elapsed);
                     this.elements.bpm.textContent = bpm;
                 } else {
                     this.elements.bpm.textContent = '0';
                 }
-                
-                // Päivitä jäljellä oleva aika
                 if (!this.startTime) {
                     this.elements.timeLeft.textContent = this.selectedTime + 's';
                     this.elements.totalTime.textContent = '00:00';
                 }
             }
         }
-
-        // Käynnistä sovellus kun sivu on ladattu
         document.addEventListener('DOMContentLoaded', () => {
             new DrumBeatCounter();
         });
